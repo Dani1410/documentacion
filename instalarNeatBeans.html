@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Instalación de NetBeans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Tech Neutrals & Teal -->
+    <!-- Application Structure Plan: La aplicación está diseñada como una guía de tareas personalizada. El elemento central es un selector de Sistema Operativo (SO) que filtra dinámicamente todo el contenido. Esta estructura se eligió porque el principal desafío para el usuario es identificar los pasos específicos para su plataforma. El flujo es: 1) Seleccionar SO. 2) Seguir una serie de pasos presentados en formato de acordeón (Preparación JDK, Instalación NetBeans, Primer Proyecto, Solución de Problemas). Este diseño transforma un documento lineal y denso en una herramienta interactiva, eficiente y fácil de seguir, reduciendo la carga cognitiva y enfocando al usuario solo en la información relevante. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Pasos de instalación para Windows, macOS, Linux. Goal: Guiar al usuario. Viz/Presentation: Bloques de texto y código con contenido dinámico. Interaction: Selector de SO para filtrar el contenido. Justification: La personalización es clave para simplificar un proceso técnico complejo.
+        - Report Info: Comandos de terminal, rutas de archivos. Goal: Facilitar la copia y reducir errores. Viz/Presentation: Bloques de código con fondo oscuro. Interaction: Botón para copiar contenido al portapapeles. Justification: Mejora drástica de la usabilidad.
+        - Report Info: Jerarquía de configuración (JDK -> NetBeans -> Proyecto). Goal: Organizar y estructurar la guía. Viz/Presentation: Secciones en formato de acordeón (<details>). Interaction: Clic para expandir/colapsar. Justification: Mantiene la interfaz limpia y permite al usuario enfocarse en un paso a la vez.
+        - Report Info: Flujo de compilación (código -> build -> run). Goal: Informar. Viz/Presentation: Diagrama simple creado con HTML/Tailwind. Interaction: Estático. Justification: Aporta claridad visual sin librerías externas.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary .arrow {
+            transform: rotate(90deg);
+        }
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            position: relative;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: #475569; /* slate-600 */
+            color: #e2e8f0; /* slate-200 */
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: #64748b; /* slate-500 */
+        }
+        .os-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .os-btn.active {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            border-color: #0d9488;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Instalación de Java y NetBeans</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">Guía interactiva para configurar tu entorno de desarrollo Java con Apache NetBeans.</p>
+        </header>
+
+        <section id="os-selector" class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">1. Selecciona tu Sistema Operativo</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
+                <button id="btn-windows" class="os-btn flex items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:shadow-md hover:border-teal-500">
+                    <span class="text-2xl mr-4">🪟</span>
+                    <span class="text-xl font-semibold">Windows</span>
+                </button>
+                <button id="btn-macos" class="os-btn flex items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:shadow-md hover:border-teal-500">
+                    <span class="text-2xl mr-4"></span>
+                    <span class="text-xl font-semibold">macOS</span>
+                </button>
+                <button id="btn-linux" class="os-btn flex items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:shadow-md hover:border-teal-500">
+                    <span class="text-2xl mr-4">🐧</span>
+                    <span class="text-xl font-semibold">Linux</span>
+                </button>
+            </div>
+        </section>
+
+        <main id="guide-content" class="space-y-4">
+            <!-- Content will be injected here by JavaScript -->
+        </main>
+
+        <footer class="text-center mt-16 pt-8 border-t border-slate-200">
+            <p class="text-slate-500">Creado a partir de guías de instalación oficiales. ¡Feliz codificación!</p>
+        </footer>
+    </div>
+
+    <script>
+        const contentData = {
+            windows: {
+                jdk: {
+                    title: 'Paso 2: Instalar el JDK (Kit de Desarrollo de Java)',
+                    content: `
+                        <p class="mb-4">NetBeans necesita un JDK para funcionar. Recomendamos <strong>Adoptium Temurin</strong>, una versión robusta y gratuita de OpenJDK.</p>
+                        <ol class="list-decimal list-inside space-y-4">
+                            <li><strong>Descarga:</strong> Ve a <a href="https://adoptium.net/temurin/releases/" target="_blank" class="text-teal-600 hover:underline font-semibold">adoptium.net</a> y descarga el instalador <strong>.msi</strong> para Windows x64 de la última versión LTS (e.g., JDK 21).</li>
+                            <li><strong>Instala:</strong> Ejecuta el instalador .msi. Durante la instalación, asegúrate de habilitar las siguientes características:
+                                <ul class="list-disc list-inside pl-6 mt-2 space-y-1 bg-slate-50 p-3 rounded-md">
+                                    <li><strong>Add to PATH</strong> (esencial).</li>
+                                    <li><strong>Set JAVA_HOME variable</strong> (muy recomendado).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Verifica:</strong> Abre una <strong>NUEVA</strong> ventana de Símbolo del sistema (cmd) y ejecuta <code>java -version</code> y <code>javac -version</code>. Ambos comandos deben mostrar la versión del JDK instalado.</li>
+                        </ol>
+                        <div class="mt-4 code-block">
+                           <pre><code>java -version
+javac -version</code></pre>
+                           <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                       </div>
+                    `
+                },
+                netbeans: {
+                    title: 'Paso 3: Instalar Apache NetBeans',
+                    content: `
+                        <ol class="list-decimal list-inside space-y-4">
+                            <li><strong>Descarga:</strong> Ve a la <a href="https://netbeans.apache.org/front/main/download/" target="_blank" class="text-teal-600 hover:underline font-semibold">página oficial de Apache NetBeans</a> y descarga el instalador <strong>.exe</strong> para Windows.</li>
+                            <li><strong>Instala:</strong> Ejecuta el instalador .exe. Sigue el asistente:
+                                <ul class="list-disc list-inside pl-6 mt-2 space-y-1">
+                                    <li>Acepta la licencia.</li>
+                                    <li>El instalador debería detectar automáticamente el JDK que instalaste. Confirma que la ruta es correcta.</li>
+                                    <li>Acepta la ruta de instalación por defecto para NetBeans.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Inicia NetBeans:</strong> Una vez instalado, busca "Apache NetBeans" en tu menú de inicio y lánzalo.</li>
+                        </ol>
+                    `
+                }
+            },
+            macos: {
+                jdk: {
+                    title: 'Paso 2: Instalar el JDK (Kit de Desarrollo de Java)',
+                    content: `
+                        <p class="mb-4">NetBeans necesita un JDK para funcionar. Recomendamos <strong>Adoptium Temurin</strong>, una versión robusta y gratuita de OpenJDK.</p>
+                        <ol class="list-decimal list-inside space-y-4">
+                            <li><strong>Descarga:</strong> Ve a <a href="https://adoptium.net/temurin/releases/" target="_blank" class="text-teal-600 hover:underline font-semibold">adoptium.net</a> y descarga el instalador <strong>.pkg</strong> de la última versión LTS (e.g., JDK 21). Elige 'AArch64' para Apple Silicon (M1/M2/...) o 'x64' para Intel.</li>
+                            <li><strong>Instala:</strong> Ejecuta el instalador .pkg. Te guiará a través del proceso. El JDK se instalará generalmente en <code>/Library/Java/JavaVirtualMachines/</code>.</li>
+                            <li><strong>Verifica:</strong> Abre una <strong>NUEVA</strong> ventana de Terminal y ejecuta <code>java -version</code> y <code>javac -version</code>. Ambos comandos deben mostrar la versión del JDK instalado. En macOS, la utilidad <code>/usr/libexec/java_home</code> ayuda a gestionar esto.</li>
+                        </ol>
+                         <div class="mt-4 code-block">
+                           <pre><code>/usr/libexec/java_home -V
+java -version
+javac -version</code></pre>
+                           <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                       </div>
+                    `
+                },
+                netbeans: {
+                    title: 'Paso 3: Instalar Apache NetBeans',
+                    content: `
+                        <ol class="list-decimal list-inside space-y-4">
+                            <li><strong>Descarga:</strong> Ve a la <a href="https://netbeans.apache.org/front/main/download/" target="_blank" class="text-teal-600 hover:underline font-semibold">página oficial de Apache NetBeans</a> y descarga el instalador <strong>.pkg</strong> para macOS.</li>
+                            <li><strong>Instala:</strong> Ejecuta el instalador .pkg. Sigue el asistente. NetBeans se instalará en tu carpeta de Aplicaciones.</li>
+                            <li><strong>Inicia NetBeans:</strong> Busca "Apache NetBeans" en tu carpeta de Aplicaciones o en el Launchpad y lánzalo.</li>
+                        </ol>
+                    `
+                }
+            },
+            linux: {
+                jdk: {
+                    title: 'Paso 2: Instalar el JDK (Kit de Desarrollo de Java)',
+                    content: `
+                        <p class="mb-4">NetBeans necesita un JDK para funcionar. La forma más sencilla en sistemas basados en Debian/Ubuntu es usar el gestor de paquetes.</p>
+                        <ol class="list-decimal list-inside space-y-4">
+                            <li><strong>Instala:</strong> Abre una terminal y ejecuta el siguiente comando para instalar una versión LTS de OpenJDK.</li>
+                        </ol>
+                        <div class="mt-4 code-block">
+                           <pre><code>sudo apt update
+sudo apt install openjdk-21-jdk</code></pre>
+                           <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        </div>
+                        <p class="mt-4">Si usas otra distribución o prefieres una instalación manual, puedes descargar el archivo <strong>.tar.gz</strong> desde <a href="https://adoptium.net/temurin/releases/" target="_blank" class="text-teal-600 hover:underline font-semibold">adoptium.net</a>, extraerlo y configurar las variables <code>JAVA_HOME</code> y <code>PATH</code> en tu archivo <code>~/.bashrc</code> o similar.</p>
+                        <ol class="list-decimal list-inside space-y-4 mt-4" start="2">
+                           <li><strong>Verifica:</strong> Abre una <strong>NUEVA</strong> terminal y ejecuta <code>java -version</code> y <code>javac -version</code>. Ambos comandos deben mostrar la versión correcta.</li>
+                        </ol>
+                         <div class="mt-4 code-block">
+                           <pre><code>java -version
+javac -version</code></pre>
+                           <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                       </div>
+                    `
+                },
+                netbeans: {
+                    title: 'Paso 3: Instalar Apache NetBeans',
+                    content: `
+                        <p class="mb-4">La forma más sencilla de instalar NetBeans en la mayoría de las distribuciones de Linux es a través de <strong>Snap</strong>.</p>
+                        <ol class="list-decimal list-inside space-y-4">
+                            <li><strong>Instala con Snap:</strong> Asegúrate de tener Snap instalado y luego ejecuta el siguiente comando en la terminal. El flag <code>--classic</code> es necesario para que NetBeans pueda acceder a los archivos del sistema.</li>
+                        </ol>
+                         <div class="mt-4 code-block">
+                           <pre><code>sudo snap install netbeans --classic</code></pre>
+                           <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                       </div>
+                       <p class="mt-4">Alternativamente, puedes descargar el instalador <strong>.deb</strong> o el archivo binario <strong>.zip</strong> desde la <a href="https://netbeans.apache.org/front/main/download/" target="_blank" class="text-teal-600 hover:underline font-semibold">página oficial</a>.</p>
+                       <ol class="list-decimal list-inside space-y-4 mt-4" start="2">
+                           <li><strong>Inicia NetBeans:</strong> Una vez instalado, busca "Apache NetBeans" en el menú de aplicaciones de tu escritorio y lánzalo.</li>
+                       </ol>
+                    `
+                }
+            }
+        };
+
+        const commonContent = {
+            project: {
+                title: 'Paso 4: Crear tu Primer Proyecto "¡Hola, Mundo!"',
+                content: `
+                    <p class="mb-4">Vamos a crear un proyecto simple usando <strong>Maven</strong>, una herramienta de construcción moderna bien integrada en NetBeans.</p>
+                    <ol class="list-decimal list-inside space-y-4">
+                        <li><strong>Nuevo Proyecto:</strong> En NetBeans, ve a <code>File > New Project...</code>.</li>
+                        <li><strong>Seleccionar Plantilla:</strong> Elige la categoría <strong>Java with Maven</strong> y el proyecto <strong>Java Application</strong>. Haz clic en "Next".</li>
+                        <li><strong>Nombrar Proyecto:</strong> Dale un nombre al proyecto (e.g., <code>HelloWorldApp</code>) y define un "Package" (e.g., <code>com.mycompany.helloworldapp</code>). Haz clic en "Finish".</li>
+                        <li><strong>Escribir Código:</strong> NetBeans creará una clase principal. Modifícala para que el método <code>main</code> contenga:</li>
+                    </ol>
+                    <div class="mt-4 code-block">
+                       <pre><code>public class HelloWorldApp {
+    public static void main(String[] args) {
+        // Escribe sout y presiona Tab para autocompletar
+        System.out.println("Hello, World!");
+    }
+}</code></pre>
+                       <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                   </div>
+                   <ol class="list-decimal list-inside space-y-4 mt-4" start="5">
+                       <li><strong>Ejecutar Proyecto:</strong> Haz clic derecho en el proyecto en la ventana "Projects" y selecciona <strong>Run</strong>, o presiona el botón de play verde en la barra de herramientas.</li>
+                       <li><strong>Ver la Salida:</strong> El mensaje "Hello, World!" aparecerá en la ventana de "Output" en la parte inferior del IDE.</li>
+                   </ol>
+                `
+            },
+            troubleshooting: {
+                title: 'Solución de Problemas Comunes',
+                content: `
+                    <details class="bg-slate-100 p-4 rounded-lg group">
+                        <summary class="flex justify-between items-center cursor-pointer font-semibold text-slate-800">
+                            NetBeans no encuentra el JDK al instalar o iniciar
+                            <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-2">
+                           <p>Si NetBeans no se inicia, es probable que no encuentre el JDK. Puedes forzar la ruta editando el archivo <code>netbeans.conf</code>.</p>
+                           <p><strong>Ruta del archivo (ejemplo):</strong></p>
+                           <div class="code-block" id="netbeans-conf-path"></div>
+                           <p class="mt-2">Busca la línea <code>netbeans_jdkhome</code>, quítale el '#' del inicio si lo tiene, y pon la ruta a tu JDK entre comillas.</p>
+                           <div class="code-block" id="netbeans-conf-content"></div>
+                        </div>
+                    </details>
+                    <details class="bg-slate-100 p-4 rounded-lg group mt-2">
+                        <summary class="flex justify-between items-center cursor-pointer font-semibold text-slate-800">
+                            Mejorar el rendimiento de NetBeans (más memoria)
+                            <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-2">
+                           <p>Puedes aumentar la memoria que NetBeans utiliza editando los parámetros <code>-J-Xms</code> (memoria inicial) y <code>-J-Xmx</code> (memoria máxima) en la línea <code>netbeans_default_options</code> dentro del mismo archivo <code>netbeans.conf</code>.</p>
+                        </div>
+                    </details>
+                `
+            }
+        };
+
+        const troubleshootingPaths = {
+            windows: {
+                confPath: `C:\\Program Files\\NetBeans-XX\\netbeans\\etc\\netbeans.conf`,
+                confContent: `netbeans_jdkhome="C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.4.7-hotspot"`
+            },
+            macos: {
+                confPath: `/Applications/NetBeans/NetBeans XX.app/Contents/Resources/NetBeans/etc/netbeans.conf`,
+                confContent: `netbeans_jdkhome="/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"`
+            },
+            linux: {
+                confPath: `/opt/netbeans-XX/etc/netbeans.conf (si se instaló manualmente) o /snap/netbeans/current/etc/netbeans.conf`,
+                confContent: `netbeans_jdkhome="/usr/lib/jvm/java-21-openjdk-amd64"`
+            }
+        };
+
+        const state = {
+            selectedOS: null
+        };
+
+        const guideContentEl = document.getElementById('guide-content');
+        const osButtons = {
+            windows: document.getElementById('btn-windows'),
+            macos: document.getElementById('btn-macos'),
+            linux: document.getElementById('btn-linux'),
+        };
+
+        function createSection(id, title, content) {
+            return `
+                <section id="${id}" class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-800">${title}</h2>
+                    ${content}
+                </section>
+            `;
+        }
+
+        function renderContent() {
+            if (!state.selectedOS) return;
+
+            const osData = contentData[state.selectedOS];
+            let html = '';
+            
+            html += createSection('jdk-install', osData.jdk.title, osData.jdk.content);
+            html += createSection('netbeans-install', osData.netbeans.title, osData.netbeans.content);
+            html += createSection('first-project', commonContent.project.title, commonContent.project.content);
+            html += createSection('troubleshooting', commonContent.troubleshooting.title, commonContent.troubleshooting.content);
+
+            guideContentEl.innerHTML = html;
+            
+            // Update troubleshooting paths
+            const tsPaths = troubleshootingPaths[state.selectedOS];
+            document.getElementById('netbeans-conf-path').innerText = tsPaths.confPath;
+            document.getElementById('netbeans-conf-content').innerText = tsPaths.confContent;
+
+            Object.keys(osButtons).forEach(os => {
+                osButtons[os].classList.remove('active');
+            });
+            osButtons[state.selectedOS].classList.add('active');
+        }
+
+        function handleOSSelect(os) {
+            state.selectedOS = os;
+            renderContent();
+        }
+
+        osButtons.windows.addEventListener('click', () => handleOSSelect('windows'));
+        osButtons.macos.addEventListener('click', () => handleOSSelect('macos'));
+        osButtons.linux.addEventListener('click', () => handleOSSelect('linux'));
+        
+        function copyCode(button) {
+            const pre = button.previousElementSibling;
+            const code = pre.innerText;
+            const textArea = document.createElement('textarea');
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = '¡Copiado!';
+                setTimeout(() => {
+                    button.textContent = 'Copiar';
+                }, 2000);
+            } catch (err) {
+                console.error('Error al copiar texto: ', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        window.onload = () => {
+             handleOSSelect('windows'); // Default to Windows
+        }
+
+    </script>
+</body>
+</html>
