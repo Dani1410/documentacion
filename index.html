@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva para Configurar Java</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: La aplicación se centra en una estructura orientada a tareas, comenzando con un selector de sistema operativo (SO). Esta elección es crucial porque el principal punto de fricción para un usuario es encontrar las instrucciones específicas para su máquina. Al seleccionar un SO (Windows, macOS, Linux), el contenido de las secciones subsiguientes se actualiza dinámicamente. La guía paso a paso utiliza un formato de acordeón (<details>) para presentar la información de forma progresiva (Descarga, Instalación, Verificación, etc.), evitando abrumar al usuario. Esta estructura transforma un documento lineal en una herramienta de consulta personalizada y eficiente. El flujo es: 1. Seleccionar SO. 2. Seguir los pasos presentados. 3. Consultar la sección de solución de problemas si es necesario. Se eligió esta arquitectura para maximizar la usabilidad y relevancia del contenido para el usuario final. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Proceso de instalación por SO. Goal: Guiar. Viz/Presentation: Bloques de texto y código específicos por SO. Interaction: Selector de SO para filtrar dinámicamente el contenido. Justification: Es el método más directo para personalizar la guía.
+        - Report Info: Comandos de terminal. Goal: Facilitar. Viz/Presentation: Bloques de código con un botón para copiar. Interaction: Click en el botón para copiar el comando al portapapeles. Justification: Mejora drásticamente la usabilidad y reduce errores de tipeo.
+        - Report Info: Flujo de compilación (código fuente -> bytecode -> ejecución). Goal: Organizar/Informar. Viz/Presentation: Diagrama de flujo simple creado con HTML y Tailwind CSS. Interaction: Estático. Justification: Refuerza visualmente el concepto clave del proceso de Java de una manera limpia y sin necesidad de librerías externas.
+        - Report Info: Errores comunes. Goal: Ayudar. Viz/Presentation: Lista de problemas en formato de acordeón. Interaction: Click para expandir la solución. Justification: Mantiene la interfaz limpia, mostrando detalles complejos solo cuando se solicitan.
+        - Library/Method: Vanilla JavaScript para la lógica de estado e interacciones. Tailwind CSS para el diseño. No se utiliza Chart.js ya que no hay datos cuantitativos que justifiquen un gráfico; un diagrama HTML/CSS es más apropiado.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary .arrow {
+            transform: rotate(90deg);
+        }
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: #475569; /* slate-600 */
+            color: #e2e8f0; /* slate-200 */
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: #64748b; /* slate-500 */
+        }
+        .os-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .os-btn.active {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            border-color: #0d9488;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Guía Interactiva de Configuración de Java</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">Una herramienta paso a paso para instalar Java y compilar tu primer programa desde la línea de comandos.</p>
+        </header>
+
+        <section id="os-selector" class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">1. Elige tu Sistema Operativo</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
+                <button id="btn-windows" class="os-btn flex items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:shadow-md hover:border-teal-500">
+                    <span class="text-2xl mr-4">🪟</span>
+                    <span class="text-xl font-semibold">Windows</span>
+                </button>
+                <button id="btn-macos" class="os-btn flex items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:shadow-md hover:border-teal-500">
+                    <span class="text-2xl mr-4"></span>
+                    <span class="text-xl font-semibold">macOS</span>
+                </button>
+                <button id="btn-linux" class="os-btn flex items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-lg shadow-sm hover:shadow-md hover:border-teal-500">
+                    <span class="text-2xl mr-4">🐧</span>
+                    <span class="text-xl font-semibold">Linux</span>
+                </button>
+            </div>
+        </section>
+
+        <main id="content-area">
+            <div id="placeholder" class="text-center text-slate-500 py-16">
+                <p>Selecciona tu sistema operativo para ver las instrucciones.</p>
+            </div>
+            <div id="guide-content" class="hidden">
+                <h2 class="text-2xl font-bold text-center mb-8 text-slate-800">2. Proceso de Instalación para <span id="os-name" class="text-teal-600"></span></h2>
+                <div class="space-y-4">
+                    
+                    <details class="bg-white p-6 rounded-lg shadow-sm group">
+                        <summary class="flex justify-between items-center cursor-pointer">
+                            <h3 class="text-xl font-semibold text-slate-800">Paso 1: Entender y Descargar el JDK</h3>
+                            <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-4">
+                            <p>Antes de descargar, es importante saber que necesitas el <strong>JDK (Kit de Desarrollo de Java)</strong>, no solo el JRE. El JDK incluye el compilador (`javac`) y otras herramientas para crear programas, mientras que el JRE solo sirve para ejecutarlos.</p>
+                            <p>Recomendamos descargar <strong>Adoptium Temurin</strong>, una versión de OpenJDK gratuita, robusta y con soporte a largo plazo (LTS).</p>
+                            <a href="https://adoptium.net/temurin/releases/" target="_blank" class="inline-block bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
+                                Ir al sitio de descarga de Adoptium
+                            </a>
+                            <p id="download-recommendation" class="mt-2 p-4 bg-teal-50 border border-teal-200 rounded-lg"></p>
+                        </div>
+                    </details>
+                    
+                    <div id="installation-steps"></div>
+                    
+                    <details class="bg-white p-6 rounded-lg shadow-sm group">
+                        <summary class="flex justify-between items-center cursor-pointer">
+                            <h3 class="text-xl font-semibold text-slate-800">Paso 4: Tu Primer Programa "¡Hola, Mundo!"</h3>
+                            <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                        </summary>
+                        <div class="mt-4 text-slate-600 space-y-6">
+                            <p>Ahora que todo está configurado, vamos a escribir, compilar y ejecutar un programa simple. Este proceso es el mismo para todos los sistemas operativos.</p>
+                            
+                            <div>
+                                <h4 class="font-semibold text-slate-700 mb-2">A. Escribe el código</h4>
+                                <p class="mb-2">Abre un editor de texto simple (como Bloc de Notas) y escribe el siguiente código. Guárdalo en una carpeta de proyectos (ej. `C:\JavaProjects`) con el nombre exacto <code class="bg-slate-200 text-slate-800 px-1 rounded">HelloWorld.java</code>.</p>
+                                <div class="code-block">
+                                    <pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("¡Hola, Mundo!");
+    }
+}</code></pre>
+                                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                                </div>
+                            </div>
+
+                            <div>
+                               <h4 class="font-semibold text-slate-700 mb-2">B. Compila el código</h4>
+                               <p class="mb-2">Abre una nueva terminal, navega a tu carpeta de proyectos y ejecuta el siguiente comando. Esto creará un archivo <code class="bg-slate-200 text-slate-800 px-1 rounded">HelloWorld.class</code>.</p>
+                               <div class="code-block">
+                                   <pre><code>javac HelloWorld.java</code></pre>
+                                   <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                               </div>
+                           </div>
+
+                           <div>
+                               <h4 class="font-semibold text-slate-700 mb-2">C. Ejecuta el programa</h4>
+                               <p class="mb-2">En la misma terminal, ejecuta el siguiente comando (nota: sin la extensión <code class="bg-slate-200 text-slate-800 px-1 rounded">.class</code>). Verás "¡Hola, Mundo!" impreso en la consola.</p>
+                               <div class="code-block">
+                                   <pre><code>java HelloWorld</code></pre>
+                                   <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                               </div>
+                           </div>
+                           
+                           <div class="pt-4">
+                                <h4 class="font-semibold text-slate-700 mb-4 text-center">Diagrama del Proceso</h4>
+                                <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+                                    <div class="p-4 bg-slate-100 rounded-lg shadow-sm">
+                                        <p class="font-semibold">HelloWorld.java</p>
+                                        <p class="text-sm text-slate-500">(Código Fuente)</p>
+                                    </div>
+                                    <div class="font-mono text-teal-600 text-2xl font-bold transform -rotate-90 md:rotate-0">→</div>
+                                    <div class="p-2 bg-teal-100 border border-teal-200 rounded-full shadow-sm">
+                                        <p class="font-mono text-teal-800">javac</p>
+                                    </div>
+                                    <div class="font-mono text-teal-600 text-2xl font-bold transform -rotate-90 md:rotate-0">→</div>
+                                    <div class="p-4 bg-slate-100 rounded-lg shadow-sm">
+                                        <p class="font-semibold">HelloWorld.class</p>
+                                        <p class="text-sm text-slate-500">(Bytecode)</p>
+                                    </div>
+                                    <div class="font-mono text-teal-600 text-2xl font-bold transform -rotate-90 md:rotate-0">→</div>
+                                     <div class="p-2 bg-teal-100 border border-teal-200 rounded-full shadow-sm">
+                                        <p class="font-mono text-teal-800">java</p>
+                                    </div>
+                                    <div class="font-mono text-teal-600 text-2xl font-bold transform -rotate-90 md:rotate-0">→</div>
+                                    <div class="p-4 bg-green-100 border border-green-200 rounded-lg shadow-sm">
+                                        <p class="font-semibold">¡Hola, Mundo!</p>
+                                        <p class="text-sm text-green-700">(Salida)</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </main>
+
+        <section id="troubleshooting" class="mt-16">
+            <h2 class="text-2xl font-bold text-center mb-8 text-slate-800">3. Solución de Problemas Comunes</h2>
+            <div class="space-y-4 max-w-4xl mx-auto">
+                <details class="bg-white p-6 rounded-lg shadow-sm group">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-lg font-semibold text-slate-800">Error: `java` o `javac` no se reconoce como un comando...</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-2">
+                        <p><strong>Causa:</strong> La variable de entorno `PATH` no está configurada correctamente. El sistema no sabe dónde encontrar los ejecutables de Java.</p>
+                        <p><strong>Solución:</strong></p>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Revisa cuidadosamente el "Paso 2: Instalación y Configuración" para tu sistema operativo.</li>
+                            <li>Asegúrate de que la ruta al directorio `bin` del JDK sea correcta.</li>
+                            <li>Verifica que la variable `JAVA_HOME` apunte al directorio raíz del JDK.</li>
+                            <li><strong>¡Importante!</strong> Cierra y abre una <strong>NUEVA</strong> ventana de terminal después de cambiar las variables de entorno.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="bg-white p-6 rounded-lg shadow-sm group">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-lg font-semibold text-slate-800">Error: Could not find or load main class...</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-2">
+                        <p><strong>Causas Posibles:</strong></p>
+                         <ul class="list-disc list-inside space-y-1">
+                            <li>No estás en el directorio correcto en la terminal. Usa `cd` para navegar a la carpeta que contiene tu archivo `.class`.</li>
+                            <li>Error al escribir el nombre de la clase. Debe ser idéntico (mayúsculas y minúsculas) al del archivo.</li>
+                            <li>Intentaste ejecutar `java HelloWorld.class`. El comando correcto es `java HelloWorld` (sin la extensión).</li>
+                            <li>La compilación (`javac`) falló y el archivo `.class` nunca se creó. Revisa si hay errores de compilación.</li>
+                        </ul>
+                    </div>
+                </details>
+                 <details class="bg-white p-6 rounded-lg shadow-sm group">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-lg font-semibold text-slate-800">Error de compilación: class X is public, should be declared in a file named X.java</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-2">
+                        <p><strong>Causa:</strong> El nombre del archivo `.java` no coincide exactamente con el nombre de la clase pública que contiene.</p>
+                        <p><strong>Solución:</strong> Renombra el archivo o la clase para que sean idénticos, respetando mayúsculas y minúsculas.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <footer class="text-center mt-16 pt-8 border-t border-slate-200">
+            <p class="text-slate-500">¡Listo para programar! Esta base te servirá incluso si decides usar IDEs más avanzados en el futuro.</p>
+        </footer>
+    </div>
+
+    <script>
+        const contentData = {
+            windows: {
+                name: "Windows",
+                download: "Para Windows (x64), descarga el instalador <strong>.msi</strong>. Es la opción más sencilla ya que te guiará en la instalación.",
+                install: `
+                <details class="bg-white p-6 rounded-lg shadow-sm group">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-xl font-semibold text-slate-800">Paso 2: Instalación y Configuración</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-4">
+                        <p>Al ejecutar el instalador .msi, asegúrate de activar las siguientes opciones en el asistente:</p>
+                        <ul class="list-disc list-inside pl-4 space-y-1">
+                            <li><strong>Add to PATH:</strong> (Esencial) Permite ejecutar comandos de Java desde cualquier lugar.</li>
+                            <li><strong>Set JAVA_HOME variable:</strong> (Muy recomendado) Es una buena práctica que ayuda a otras herramientas a encontrar Java.</li>
+                        </ul>
+                        <p>Si eliges la instalación manual (.zip), deberás configurar las variables de entorno manualmente:</p>
+                        <ol class="list-decimal list-inside pl-4 space-y-2">
+                            <li>Busca y abre "Editar las variables de entorno del sistema".</li>
+                            <li>Haz clic en "Variables de entorno...".</li>
+                            <li>En "Variables del sistema", crea una nueva variable <strong>JAVA_HOME</strong> que apunte a tu carpeta JDK (ej. <code class="bg-slate-200 text-slate-800 px-1 rounded">C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.4.7-hotspot</code>).</li>
+                            <li>Edita la variable <strong>Path</strong>, añade una nueva entrada: <code class="bg-slate-200 text-slate-800 px-1 rounded">%JAVA_HOME%\\bin</code> y muévela al principio de la lista.</li>
+                        </ol>
+                    </div>
+                </details>
+                `,
+                verify: `
+                <details class="bg-white p-6 rounded-lg shadow-sm group" open>
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-xl font-semibold text-slate-800">Paso 3: Verificación</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-4">
+                       <p>Abre una <strong>NUEVA</strong> ventana de Símbolo del sistema (cmd) o PowerShell y ejecuta estos dos comandos para verificar que todo está correcto.</p>
+                       <div>
+                           <h4 class="font-semibold text-slate-700 mb-2">Verificar versión de Java (runtime):</h4>
+                           <div class="code-block">
+                               <pre><code>java -version</code></pre>
+                               <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                           </div>
+                       </div>
+                       <div>
+                           <h4 class="font-semibold text-slate-700 mb-2">Verificar versión del compilador:</h4>
+                           <div class="code-block">
+                               <pre><code>javac -version</code></pre>
+                               <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                           </div>
+                       </div>
+                    </div>
+                </details>
+                `
+            },
+            macos: {
+                name: "macOS",
+                download: "Para macOS, descarga el instalador <strong>.pkg</strong>. Manejará la instalación de forma automática. Elige x64 para Mac con Intel y aarch64 para Mac con Apple Silicon (M1/M2/M3).",
+                install: `
+                <details class="bg-white p-6 rounded-lg shadow-sm group">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-xl font-semibold text-slate-800">Paso 2: Instalación y Configuración</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-4">
+                        <p>El instalador .pkg generalmente instala el JDK en <code class="bg-slate-200 text-slate-800 px-1 rounded">/Library/Java/JavaVirtualMachines/</code> y lo configura para que el sistema lo reconozca. Para asegurar que las variables de entorno estén bien configuradas para tu terminal, sigue estos pasos:</p>
+                        <ol class="list-decimal list-inside pl-4 space-y-2">
+                            <li>Abre la Terminal y determina tu shell con <code class="bg-slate-200 text-slate-800 px-1 rounded">echo $SHELL</code>. Normalmente será Zsh (<code class="bg-slate-200 text-slate-800 px-1 rounded">/bin/zsh</code>).</li>
+                            <li>Abre el archivo de configuración de tu shell (ej. <code class="bg-slate-200 text-slate-800 px-1 rounded">nano ~/.zshrc</code>).</li>
+                            <li>Añade las siguientes líneas al final del archivo para establecer JAVA_HOME y actualizar tu PATH:</li>
+                        </ol>
+                        <div class="code-block">
+                           <pre><code>export JAVA_HOME=$(/usr/libexec/java_home)
+export PATH=$JAVA_HOME/bin:$PATH</code></pre>
+                           <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                       </div>
+                       <p>Guarda el archivo y aplica los cambios con <code class="bg-slate-200 text-slate-800 px-1 rounded">source ~/.zshrc</code> o abriendo una nueva terminal.</p>
+                    </div>
+                </details>
+                `,
+                verify: `
+                 <details class="bg-white p-6 rounded-lg shadow-sm group" open>
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-xl font-semibold text-slate-800">Paso 3: Verificación</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-4">
+                       <p>Abre una <strong>NUEVA</strong> ventana de Terminal y ejecuta estos dos comandos para verificar la instalación.</p>
+                        <div>
+                           <h4 class="font-semibold text-slate-700 mb-2">Verificar versión de Java (runtime):</h4>
+                           <div class="code-block">
+                               <pre><code>java -version</code></pre>
+                               <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                           </div>
+                       </div>
+                       <div>
+                           <h4 class="font-semibold text-slate-700 mb-2">Verificar versión del compilador:</h4>
+                           <div class="code-block">
+                               <pre><code>javac -version</code></pre>
+                               <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                           </div>
+                       </div>
+                    </div>
+                </details>
+                `
+            },
+            linux: {
+                name: "Linux",
+                download: "Para Linux, la forma más genérica es descargar el archivo <strong>.tar.gz</strong> (para arquitectura x64). Esto te da control total sobre la ubicación de la instalación.",
+                install: `
+                <details class="bg-white p-6 rounded-lg shadow-sm group">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-xl font-semibold text-slate-800">Paso 2: Instalación y Configuración</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-4">
+                        <p>Recomendamos extraer el JDK en un directorio como <code class="bg-slate-200 text-slate-800 px-1 rounded">/opt/jdk</code> (requiere sudo) o en tu carpeta de usuario. Después, configura las variables de entorno:</p>
+                        <ol class="list-decimal list-inside pl-4 space-y-2">
+                             <li>Abre el archivo de configuración de tu shell, comúnmente <code class="bg-slate-200 text-slate-800 px-1 rounded">nano ~/.bashrc</code>.</li>
+                             <li>Añade las siguientes líneas al final del archivo, ajustando la ruta de JAVA_HOME a donde extrajiste el JDK.</li>
+                        </ol>
+                        <div class="code-block">
+                           <pre><code># Reemplaza la ruta con tu ubicación real
+export JAVA_HOME=/opt/jdk/jdk-21.0.4+7
+export PATH=$JAVA_HOME/bin:$PATH</code></pre>
+                           <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                       </div>
+                       <p>Guarda el archivo y aplica los cambios con <code class="bg-slate-200 text-slate-800 px-1 rounded">source ~/.bashrc</code> o abriendo una nueva terminal.</p>
+                    </div>
+                </details>
+                `,
+                verify: `
+                 <details class="bg-white p-6 rounded-lg shadow-sm group" open>
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <h3 class="text-xl font-semibold text-slate-800">Paso 3: Verificación</h3>
+                        <span class="arrow text-teal-600 transform transition-transform duration-200">▶</span>
+                    </summary>
+                    <div class="mt-4 text-slate-600 space-y-4">
+                       <p>Abre una <strong>NUEVA</strong> ventana de Terminal y ejecuta estos dos comandos para verificar la instalación.</p>
+                        <div>
+                           <h4 class="font-semibold text-slate-700 mb-2">Verificar versión de Java (runtime):</h4>
+                           <div class="code-block">
+                               <pre><code>java -version</code></pre>
+                               <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                           </div>
+                       </div>
+                       <div>
+                           <h4 class="font-semibold text-slate-700 mb-2">Verificar versión del compilador:</h4>
+                           <div class="code-block">
+                               <pre><code>javac -version</code></pre>
+                               <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                           </div>
+                       </div>
+                    </div>
+                </details>
+                `
+            }
+        };
+
+        const state = {
+            selectedOS: null
+        };
+
+        const osNameEl = document.getElementById('os-name');
+        const downloadRecEl = document.getElementById('download-recommendation');
+        const installStepsEl = document.getElementById('installation-steps');
+        const placeholderEl = document.getElementById('placeholder');
+        const guideContentEl = document.getElementById('guide-content');
+        
+        const osButtons = {
+            windows: document.getElementById('btn-windows'),
+            macos: document.getElementById('btn-macos'),
+            linux: document.getElementById('btn-linux'),
+        };
+
+        function renderContent() {
+            if (!state.selectedOS) {
+                placeholderEl.style.display = 'block';
+                guideContentEl.style.display = 'none';
+                return;
+            }
+
+            placeholderEl.style.display = 'none';
+            guideContentEl.style.display = 'block';
+            
+            const data = contentData[state.selectedOS];
+            osNameEl.textContent = data.name;
+            downloadRecEl.innerHTML = data.download;
+            
+            const combinedSteps = data.install + data.verify;
+            installStepsEl.innerHTML = combinedSteps;
+
+            Object.keys(osButtons).forEach(os => {
+                osButtons[os].classList.remove('active');
+            });
+            osButtons[state.selectedOS].classList.add('active');
+        }
+
+        function handleOSSelect(os) {
+            state.selectedOS = os;
+            renderContent();
+        }
+
+        osButtons.windows.addEventListener('click', () => handleOSSelect('windows'));
+        osButtons.macos.addEventListener('click', () => handleOSSelect('macos'));
+        osButtons.linux.addEventListener('click', () => handleOSSelect('linux'));
+        
+        function copyCode(button) {
+            const pre = button.previousElementSibling;
+            const code = pre.innerText;
+            const textArea = document.createElement('textarea');
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = '¡Copiado!';
+                setTimeout(() => {
+                    button.textContent = 'Copiar';
+                }, 2000);
+            } catch (err) {
+                console.error('Error al copiar texto: ', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        window.onload = () => {
+             handleOSSelect('windows');
+        }
+
+    </script>
+</body>
+</html>
