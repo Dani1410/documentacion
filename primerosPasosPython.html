@@ -1,0 +1,451 @@
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Python para Principiantes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: Se ha diseñado una SPA de una sola página con navegación lateral fija que permite el desplazamiento suave a 5 secciones temáticas: Variables, Tipos de Datos, Print, Input y Conversión. Esta estructura lineal pero flexible guía al principiante paso a paso, pero también le permite moverse libremente. Cada sección combina teoría concisa con un "laboratorio" interactivo (simuladores de código, verificadores de tipo, calculadoras visuales) para reforzar el aprendizaje a través de la práctica inmediata. La razón de esta estructura es transformar la lectura pasiva del informe en una experiencia de aprendizaje activa y atractiva, donde el usuario "hace" en lugar de solo "leer", lo cual es crucial para asimilar conceptos de programación. -->
+    <!-- Visualization & Content Choices: 
+        - Introducción: Goal(Informar) -> Presentación(Texto claro y conciso) -> Interacción(Ninguna) -> Justificación(Establecer el contexto para el usuario.) -> Library(HTML/CSS).
+        - Variables: Goal(Organizar, Informar) -> Presentación(Diagrama visual HTML/CSS, simulador de creación de variables) -> Interacción(Usuario introduce nombre/valor, la app muestra la "caja" creada) -> Justificación(Visualizar el concepto abstracto de asignación de variables) -> Library(HTML/CSS/JS).
+        - Tipos de Datos: Goal(Comparar, Informar) -> Presentación(Pestañas para cada tipo, verificador de tipo interactivo, gráfico de Chart.js) -> Interacción(Usuario introduce un valor, la app muestra el tipo; el gráfico visualiza una distribución de tipos) -> Justificación(Permite la exploración práctica de los tipos y ofrece una vista resumida con el gráfico) -> Library(Chart.js, JS).
+        - Función print(): Goal(Interactuar, Informar) -> Presentación(Mini-consola de código simulada) -> Interacción(Usuario escribe código con `print()` y lo "ejecuta" para ver la salida) -> Justificación(Proporciona un entorno seguro para experimentar con la sintaxis de `print` y sus opciones) -> Library(JS).
+        - Función input() y Conversión: Goal(Relacionar, Interactuar) -> Presentación(Calculadora visual paso a paso) -> Interacción(Usuario introduce un número, la app muestra el proceso: `input` -> string -> `int()` -> número -> cálculo) -> Justificación(Demuestra de forma inequívoca por qué la conversión de tipos es esencial después de usar `input()`) -> Library(JS).
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #4a4a4a;
+        }
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .interactive-area {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .nav-link:hover {
+            background-color: #e9e7e2;
+            border-left-color: #c0a080;
+            color: #333;
+        }
+        .nav-link.active {
+            background-color: #f0ebe4;
+            border-left-color: #a07d5a;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row">
+
+    <nav class="w-full md:w-64 bg-[#f0ebe4] md:fixed md:h-screen p-4 md:p-6 shadow-md md:shadow-none z-10">
+        <h2 class="text-xl font-bold text-[#a07d5a] mb-6">Tus Pasos en Python</h2>
+        <ul id="nav-menu" class="space-y-2">
+            <li><a href="#intro" class="nav-link block p-3 rounded-r-lg">Introducción</a></li>
+            <li><a href="#variables" class="nav-link block p-3 rounded-r-lg">1. Variables</a></li>
+            <li><a href="#tipos" class="nav-link block p-3 rounded-r-lg">2. Tipos de Datos</a></li>
+            <li><a href="#print" class="nav-link block p-3 rounded-r-lg">3. Función print()</a></li>
+            <li><a href="#input" class="nav-link block p-3 rounded-r-lg">4. Función input()</a></li>
+            <li><a href="#conversion" class="nav-link block p-3 rounded-r-lg">5. Conversión de Tipos</a></li>
+        </ul>
+    </nav>
+
+    <main class="flex-1 md:ml-64 p-6 md:p-10 lg:p-12">
+
+        <section id="intro" class="mb-16">
+            <h1 class="text-4xl font-bold text-[#a07d5a] mb-4">Tus Primeros Pasos en Python</h1>
+            <p class="text-lg text-gray-600 leading-relaxed">¡Bienvenido al mundo de la programación! Programar es como dar una serie de instrucciones claras que un ordenador puede seguir. Python es un lenguaje ideal para empezar por su sencillez y legibilidad. Esta guía interactiva te llevará a través de los cinco pilares esenciales para que puedas escribir tus primeros programas. En cada sección, no solo leerás la teoría, sino que podrás experimentar con ella.</p>
+        </section>
+
+        <section id="variables" class="mb-16 space-y-8">
+            <h2 class="text-3xl font-bold border-b-2 border-[#e9e7e2] pb-2">1. Variables: Almacenando Información</h2>
+            <div class="prose max-w-none">
+                <p>Una variable es un espacio con nombre en la memoria del ordenador donde guardas un dato. Piénsalo como una <strong>caja etiquetada</strong>: pones algo dentro (el valor) y le pones una etiqueta (el nombre de la variable) para encontrarlo fácilmente. Para crear una, usas el signo igual <code>=</code>.</p>
+                <div class="code-block">
+                    nombre_de_la_variable = valor<br><br>
+                    <span class="text-green-400"># Ejemplo:</span><br>
+                    puntuacion_jugador = 100
+                </div>
+                <p>Al nombrar variables, hay reglas: deben empezar con una letra o guion bajo, no pueden tener espacios ni caracteres especiales (salvo <code>_</code>), y distinguen mayúsculas de minúsculas. Por convención, en Python se usa <code>snake_case</code> (palabras en minúscula separadas por guiones bajos).</p>
+            </div>
+            <div class="interactive-area p-6">
+                <h3 class="text-xl font-semibold mb-4 text-[#a07d5a]">Laboratorio de Variables</h3>
+                <p class="mb-4">Crea tu propia variable. Introduce un nombre y un valor para ver cómo se "almacena".</p>
+                <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                    <input id="var-name" type="text" placeholder="Nombre de la variable (ej: nombre)" class="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-[#c0a080] focus:outline-none">
+                    <input id="var-value" type="text" placeholder="Valor (ej: Ana)" class="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-[#c0a080] focus:outline-none">
+                </div>
+                <button id="create-var-btn" class="w-full bg-[#a07d5a] text-white py-2 px-4 rounded-md hover:bg-[#8a6b4c] transition-colors">Crear Variable</button>
+                <div id="var-output-container" class="mt-6 hidden">
+                     <p class="text-center font-medium mb-2">¡Variable creada!</p>
+                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 relative bg-yellow-50">
+                        <div id="var-output-value" class="text-center text-2xl font-bold text-gray-700"></div>
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#f8f7f4] px-2">
+                           <span id="var-output-name" class="text-sm font-mono text-[#a07d5a] border border-[#c0a080] rounded-full px-3 py-1 bg-white"></span>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tipos" class="mb-16 space-y-8">
+            <h2 class="text-3xl font-bold border-b-2 border-[#e9e7e2] pb-2">2. Tipos de Datos Básicos</h2>
+            <div class="prose max-w-none">
+                <p>Un tipo de dato le dice a Python qué clase de información es una variable y qué se puede hacer con ella. Los cuatro tipos fundamentales son:</p>
+                 <ul>
+                    <li><strong>Cadena (<code>str</code>):</strong> Para texto. Se escribe entre comillas <code>' '</code> o <code>" "</code>. Ejemplo: <code>"Hola"</code>.</li>
+                    <li><strong>Entero (<code>int</code>):</strong> Para números enteros sin decimales. Ejemplo: <code>42</code>, <code>-100</code>.</li>
+                    <li><strong>Flotante (<code>float</code>):</strong> Para números con decimales. Ejemplo: <code>3.14</code>, <code>19.99</code>.</li>
+                    <li><strong>Booleano (<code>bool</code>):</strong> Representa verdad o falsedad. Solo puede ser <code>True</code> o <code>False</code> (con mayúscula inicial).</li>
+                </ul>
+                <p>Puedes usar la función <code>type()</code> para saber de qué tipo es una variable.</p>
+            </div>
+            <div class="interactive-area p-6">
+                 <h3 class="text-xl font-semibold mb-4 text-[#a07d5a]">Verificador de Tipos</h3>
+                 <p class="mb-4">Introduce un valor y Python te dirá de qué tipo es. Prueba con: <code>Hola</code>, <code>123</code>, <code>99.5</code>, <code>True</code>.</p>
+                 <input id="type-input" type="text" placeholder="Escribe un valor aquí..." class="w-full p-2 border rounded-md mb-4 focus:ring-2 focus:ring-[#c0a080] focus:outline-none">
+                 <div id="type-output" class="text-center p-4 bg-gray-100 rounded-md font-mono text-lg h-16 flex items-center justify-center">
+                    &lt;-- El tipo aparecerá aquí --&gt;
+                 </div>
+                 <div class="mt-6">
+                    <h4 class="text-lg font-semibold text-center mb-2">Distribución de Tipos en un Programa</h4>
+                    <div class="chart-container">
+                        <canvas id="typesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="print" class="mb-16 space-y-8">
+            <h2 class="text-3xl font-bold border-b-2 border-[#e9e7e2] pb-2">3. La Función <code>print()</code></h2>
+            <div class="prose max-w-none">
+                <p>La función <code>print()</code> es tu herramienta para mostrar mensajes o resultados en la pantalla. Para combinar texto y variables, la forma más moderna y recomendada son las <strong>cadenas-f</strong>. Simplemente pon una <code>f</code> antes de la comilla de apertura y encierra tus variables entre llaves <code>{}</code>.</p>
+                 <div class="code-block">
+                    nombre = "Carlos"<br>
+                    puntuacion = 85<br>
+                    <span class="text-green-400"># Usando una cadena-f</span><br>
+                    print(f"El jugador {nombre} tiene {puntuacion} puntos.")
+                </div>
+            </div>
+             <div class="interactive-area p-6">
+                <h3 class="text-xl font-semibold mb-4 text-[#a07d5a]">Mini-Consola</h3>
+                <p class="mb-4">Escribe código Python usando <code>print()</code> en el área de abajo y pulsa "Ejecutar" para ver la salida.</p>
+                 <textarea id="print-code" class="w-full h-32 p-2 border rounded-md font-mono bg-[#2d3748] text-white focus:ring-2 focus:ring-[#c0a080] focus:outline-none" spellcheck="false">nombre = "Laura"
+edad = 30
+print(f"Hola, me llamo {nombre} y tengo {edad} años.")</textarea>
+                <button id="run-print-btn" class="w-full mt-4 bg-[#a07d5a] text-white py-2 px-4 rounded-md hover:bg-[#8a6b4c] transition-colors">Ejecutar</button>
+                 <div class="mt-4">
+                    <h4 class="font-semibold">Salida de la Consola:</h4>
+                    <div id="print-output" class="p-4 mt-2 bg-black text-white rounded-md font-mono min-h-[50px]"></div>
+                 </div>
+            </div>
+        </section>
+
+        <section id="input" class="mb-16 space-y-8">
+            <h2 class="text-3xl font-bold border-b-2 border-[#e9e7e2] pb-2">4. La Función <code>input()</code></h2>
+             <div class="prose max-w-none">
+                <p>Para hacer tus programas interactivos, usas la función <code>input()</code>. Detiene el programa, muestra un mensaje y espera a que el usuario escriba algo y presione <code>Enter</code>.</p>
+                <p><strong>La Regla de Oro:</strong> ¡<code>input()</code> siempre devuelve una <strong>cadena de texto (<code>str</code>)</strong>! No importa si el usuario escribe un número, para Python inicialmente será texto. Esto es crucial y nos lleva al siguiente punto.</p>
+                <div class="code-block">
+                    nombre = input("¿Cómo te llamas? ")<br>
+                    print(f"Hola, {nombre}!")
+                </div>
+            </div>
+            <div class="interactive-area p-6">
+                <h3 class="text-xl font-semibold mb-4 text-[#a07d5a]">Simulador de <code>input()</code></h3>
+                <p class="mb-4">El programa te pedirá tu edad. Escríbela y observa el tipo de dato que Python recibe en realidad.</p>
+                <div class="flex items-center bg-gray-100 p-4 rounded-md">
+                    <label for="input-sim" class="font-mono text-gray-700 mr-2">Introduce tu edad:</label>
+                    <input id="input-sim" type="text" class="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-[#c0a080] focus:outline-none">
+                </div>
+                <button id="run-input-btn" class="w-full mt-4 bg-[#a07d5a] text-white py-2 px-4 rounded-md hover:bg-[#8a6b4c] transition-colors">Confirmar Edad</button>
+                <div id="input-output" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md text-center hidden"></div>
+            </div>
+        </section>
+
+        <section id="conversion" class="mb-16 space-y-8">
+             <h2 class="text-3xl font-bold border-b-2 border-[#e9e7e2] pb-2">5. Conversión de Tipos (Casting)</h2>
+            <div class="prose max-w-none">
+                <p>Como <code>input()</code> devuelve texto, no puedes hacer operaciones matemáticas directamente. Primero debes convertir ese texto a un tipo numérico. Este proceso se llama <strong>casting</strong>.</p>
+                <ul>
+                    <li><code>int(valor)</code>: Convierte el valor a un número entero.</li>
+                    <li><code>float(valor)</code>: Convierte el valor a un número con decimales.</li>
+                </ul>
+                <div class="code-block">
+                    edad_texto = input("Introduce tu edad: ") <span class="text-gray-400"># Recibimos "25"</span><br>
+                    edad_numero = int(edad_texto) <span class="text-gray-400"># Convertimos "25" a 25</span><br>
+                    edad_futura = edad_numero + 10 <span class="text-gray-400"># ¡Ahora sí podemos sumar!</span><br>
+                    print(f"En 10 años tendrás {edad_futura} años.")
+                </div>
+            </div>
+             <div class="interactive-area p-6">
+                <h3 class="text-xl font-semibold mb-4 text-[#a07d5a]">Calculadora de Edad Futura</h3>
+                <p class="mb-4">Introduce tu edad actual para ver el proceso de casting en acción.</p>
+                 <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                         <span class="bg-[#a07d5a] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">1</span>
+                        <input id="casting-input" type="text" placeholder="Tu edad actual" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-[#c0a080] focus:outline-none">
+                    </div>
+                    <div id="casting-step1" class="pl-12 hidden">
+                        <p class="font-mono text-sm"><code>edad_texto = input(...)</code></p>
+                        <p class="p-2 bg-gray-100 rounded-md">Valor recibido: <strong id="casting-output1" class="font-mono"></strong></p>
+                    </div>
+
+                     <div class="flex items-center gap-4">
+                         <span class="bg-[#a07d5a] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">2</span>
+                         <p class="font-mono">edad_numero = int(edad_texto)</p>
+                     </div>
+                     <div id="casting-step2" class="pl-12 hidden">
+                        <p class="p-2 bg-green-50 border border-green-200 rounded-md">Valor convertido: <strong id="casting-output2" class="font-mono"></strong></p>
+                     </div>
+                     
+                     <div class="flex items-center gap-4">
+                         <span class="bg-[#a07d5a] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">3</span>
+                         <p class="font-mono">resultado = edad_numero + 10</p>
+                     </div>
+                     <div id="casting-step3" class="pl-12 hidden">
+                        <p class="p-4 bg-blue-50 border border-blue-200 text-lg text-center rounded-md">En 10 años, tendrás <strong id="casting-output3" class="font-bold"></strong> años.</p>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('#nav-menu a');
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.3
+    };
+
+    const sectionObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === entry.target.id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        sectionObserver.observe(section);
+    });
+
+    const createVarBtn = document.getElementById('create-var-btn');
+    createVarBtn.addEventListener('click', () => {
+        const varName = document.getElementById('var-name').value || 'variable';
+        const varValue = document.getElementById('var-value').value || 'valor';
+        
+        document.getElementById('var-output-name').textContent = varName;
+        document.getElementById('var-output-value').textContent = `"${varValue}"`;
+        document.getElementById('var-output-container').classList.remove('hidden');
+    });
+
+    const typeInput = document.getElementById('type-input');
+    typeInput.addEventListener('input', () => {
+        const value = typeInput.value;
+        const typeOutput = document.getElementById('type-output');
+
+        if (value.trim() === '') {
+            typeOutput.innerHTML = '&lt;-- El tipo aparecerá aquí --&gt;';
+            return;
+        }
+
+        let typeStr = '';
+        if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+            typeStr = "<class 'bool'>";
+        } else if (!isNaN(value) && value.trim() !== '') {
+            if (value.includes('.')) {
+                typeStr = "<class 'float'>";
+            } else {
+                typeStr = "<class 'int'>";
+            }
+        } else {
+            typeStr = "<class 'str'>";
+        }
+        typeOutput.textContent = typeStr;
+    });
+
+    const runPrintBtn = document.getElementById('run-print-btn');
+    runPrintBtn.addEventListener('click', () => {
+        const code = document.getElementById('print-code').value;
+        const outputDiv = document.getElementById('print-output');
+        outputDiv.classList.remove('text-red-400');
+        outputDiv.textContent = ''; 
+
+        try {
+            const lines = code.split('\n');
+            const vars = {};
+            let capturedOutput = '';
+
+            const assignmentRegex = /^\s*([a-zA-Z_]\w*)\s*=\s*(.*)\s*$/;
+            const printRegex = /^\s*print\(\s*(f?".*")\s*\)\s*$/;
+            
+            lines.forEach(line => {
+                let match = line.match(assignmentRegex);
+                if (match) {
+                    const varName = match[1];
+                    let varValue = match[2].trim();
+                    if ((varValue.startsWith('"') && varValue.endsWith('"')) || (varValue.startsWith("'") && varValue.endsWith("'"))) {
+                        vars[varName] = varValue.substring(1, varValue.length - 1);
+                    } else if (!isNaN(varValue) && varValue.trim() !== '') {
+                        vars[varName] = varValue;
+                    } else {
+                         vars[varName] = varValue;
+                    }
+                    return;
+                }
+
+                match = line.match(printRegex);
+                if (match) {
+                    let expression = match[1];
+                    let outputString = '';
+
+                    if (expression.startsWith('f"')) {
+                        outputString = expression.substring(2, expression.length - 1);
+                        const fstringVarRegex = /\{([a-zA-Z_]\w*)\}/g;
+                        outputString = outputString.replace(fstringVarRegex, (match, varName) => {
+                            return vars[varName] !== undefined ? vars[varName] : match;
+                        });
+                    } else {
+                        outputString = expression.substring(1, expression.length - 1);
+                    }
+                    capturedOutput += outputString + '\n';
+                }
+            });
+
+            outputDiv.textContent = capturedOutput || '(No se imprimió nada o el formato del código es inválido)';
+
+        } catch (e) {
+            outputDiv.textContent = `Error de simulación: ${e.message}`;
+            outputDiv.classList.add('text-red-400');
+        }
+    });
+
+    const runInputBtn = document.getElementById('run-input-btn');
+    runInputBtn.addEventListener('click', () => {
+        const inputValue = document.getElementById('input-sim').value;
+        const outputDiv = document.getElementById('input-output');
+        if (inputValue.trim() === '') {
+            outputDiv.innerHTML = `<p>Por favor, introduce un valor.</p>`;
+            outputDiv.classList.remove('hidden');
+            return;
+        }
+        outputDiv.innerHTML = `
+            <p>Has introducido: <strong class="font-mono">${inputValue}</strong></p>
+            <p>El tipo de dato que Python recibe es: <strong class="font-mono">&lt;class 'str'&gt;</strong></p>
+        `;
+        outputDiv.classList.remove('hidden');
+    });
+
+    const castingInput = document.getElementById('casting-input');
+    castingInput.addEventListener('input', () => {
+        const value = castingInput.value;
+
+        const step1 = document.getElementById('casting-step1');
+        const output1 = document.getElementById('casting-output1');
+        const step2 = document.getElementById('casting-step2');
+        const output2 = document.getElementById('casting-output2');
+        const step3 = document.getElementById('casting-step3');
+        const output3 = document.getElementById('casting-output3');
+        
+        const allSteps = [step1, step2, step3];
+        allSteps.forEach(s => s.classList.add('hidden'));
+
+        if (value.trim() === '') return;
+
+        step1.classList.remove('hidden');
+        output1.textContent = `"${value}" (un <'str'>)`;
+
+        const num = parseInt(value, 10);
+        if (!isNaN(num)) {
+            step2.classList.remove('hidden');
+            output2.textContent = `${num} (un <'int'>)`;
+
+            step3.classList.remove('hidden');
+            output3.textContent = num + 10;
+        } else {
+            step2.classList.remove('hidden');
+            output2.innerHTML = `<span class="text-red-600">Error: No se puede convertir "${value}" a un número.</span>`;
+        }
+    });
+
+    const ctx = document.getElementById('typesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Enteros (int)', 'Cadenas (str)', 'Flotantes (float)', 'Booleanos (bool)'],
+            datasets: [{
+                label: 'Uso de Tipos',
+                data: [40, 35, 15, 10],
+                backgroundColor: [
+                    'rgba(160, 125, 90, 0.7)',
+                    'rgba(192, 160, 128, 0.7)',
+                    'rgba(225, 231, 226, 0.9)',
+                    'rgba(141, 153, 174, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(160, 125, 90, 1)',
+                    'rgba(192, 160, 128, 1)',
+                    'rgba(225, 231, 226, 1)',
+                    'rgba(141, 153, 174, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
