@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Fundamentos de Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive, thematic guide rather than a linear document. A persistent sidebar navigation allows users to jump between five core concepts (Variables, Tipos de Datos, Print, Input, Casting). This non-linear structure promotes focused learning and exploration. Each section is a self-contained "lab" with interactive elements (simulated code editors, visualizers) that allow users to actively engage with the concepts, reinforcing learning through immediate, visual feedback. This is more effective for beginners than passive reading. -->
+    <!-- Visualization & Content Choices: 
+        - Variables: Goal: Organize/Inform. Method: An interactive code simulator (textarea + div visualization). Interaction: User types variable assignment, a visual "labeled box" appears. Justification: Directly visualizes the report's core analogy.
+        - Data Types: Goal: Inform/Interact. Method: A text input and a dynamic display card. Interaction: User types a value, JS detects the type, and the card updates to show the result of `type()`. Justification: Provides instant feedback and clarifies the abstract concept of types.
+        - Print: Goal: Interact/Inform. Method: A simulated console. Interaction: User types `print()` commands with `sep` and `end` options, and the output is rendered. Justification: Allows safe experimentation with function arguments.
+        - Input/Casting: Goal: Relate/Demonstrate. Method: A multi-step interactive diagram/flow. Interaction: User follows a scenario (calculating future age), sees the `TypeError` from not casting, and then sees the successful flow with `int()`. Justification: Crucially links the `input()` function's string output to the necessity of type conversion, addressing the most common beginner pitfall.
+        - All diagrams and visuals are built with structured HTML/CSS (Tailwind) and JS for dynamic updates. No SVG/Mermaid used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .code-font { font-family: 'Courier New', Courier, monospace; }
+        .active-nav { background-color: #4338ca; color: white; }
+        .inactive-nav { background-color: #eef2ff; color: #4338ca; }
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+        .interactive-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .code-input {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            border: none;
+            width: 100%;
+            resize: none;
+        }
+        .console-output {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 4rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .variable-viz {
+            border: 2px dashed #6b7280;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .variable-tag {
+            position: absolute;
+            top: -0.75rem;
+            left: 1rem;
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-64 bg-white md:border-r border-b md:border-b-0 border-slate-200">
+            <div class="p-4">
+                <h1 class="text-xl font-bold text-indigo-700">Fundamentos de Python</h1>
+                <p class="text-sm text-slate-500">Guía Interactiva</p>
+            </div>
+            <nav id="main-nav" class="flex flex-row md:flex-col p-2 space-x-1 md:space-x-0 md:space-y-1">
+                <button data-section="variables" class="nav-button w-full text-left p-3 rounded-md font-medium transition-colors active-nav">
+                    <span class="text-lg">📦</span> Variables
+                </button>
+                <button data-section="tipos" class="nav-button w-full text-left p-3 rounded-md font-medium transition-colors inactive-nav">
+                    <span class="text-lg">🏷️</span> Tipos de Datos
+                </button>
+                <button data-section="print" class="nav-button w-full text-left p-3 rounded-md font-medium transition-colors inactive-nav">
+                    <span class="text-lg">🖨️</span> La Función print()
+                </button>
+                <button data-section="input" class="nav-button w-full text-left p-3 rounded-md font-medium transition-colors inactive-nav">
+                    <span class="text-lg">⌨️</span> La Función input()
+                </button>
+                <button data-section="casting" class="nav-button w-full text-left p-3 rounded-md font-medium transition-colors inactive-nav">
+                    <span class="text-lg">🔄</span> Conversión de Tipos
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 md:p-8">
+            <!-- Variables Section -->
+            <section id="variables" class="section-content active">
+                <h2 class="text-3xl font-bold mb-4">Variables: Almacenando Tus Datos</h2>
+                <p class="mb-6 text-slate-600">Una variable es un contenedor con un nombre (una etiqueta) donde guardamos datos. En este laboratorio, puedes crear una variable y ver cómo Python la "etiqueta" visualmente.</p>
+                
+                <div class="interactive-box">
+                    <h3 class="font-semibold mb-2 text-lg">Laboratorio de Variables</h3>
+                    <p class="text-sm text-slate-500 mb-4">Escribe una asignación de variable (ej: `nombre = "Ana"` o `puntuacion = 100`) y presiona el botón.</p>
+                    <textarea id="var-input" class="code-input mb-4" rows="2">puntuacion = 100</textarea>
+                    <button id="var-button" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Crear Variable</button>
+                    
+                    <div id="var-viz-container" class="mt-6">
+                        <h4 class="font-semibold mb-2">Visualización de Memoria:</h4>
+                        <div id="var-viz-output" class="variable-viz h-24 flex items-center justify-center text-slate-500">
+                            A la espera de una variable...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Types Section -->
+            <section id="tipos" class="section-content">
+                <h2 class="text-3xl font-bold mb-4">Tipos de Datos Básicos</h2>
+                <p class="mb-6 text-slate-600">Python clasifica los datos en diferentes tipos. Los más comunes son texto (`str`), enteros (`int`), decimales (`float`) y booleanos (`bool`). Usa el analizador para descubrir el tipo de cualquier dato.</p>
+
+                <div class="interactive-box">
+                    <h3 class="font-semibold mb-2 text-lg">Analizador de Tipos</h3>
+                    <p class="text-sm text-slate-500 mb-4">Escribe un valor en el campo de texto (ej: `¡Hola!`, `42`, `3.14`, `True`) para ver su tipo.</p>
+                    <input type="text" id="type-input" class="w-full p-2 border border-slate-300 rounded-md code-font mb-4" value="Hola Python">
+                    
+                    <div id="type-output" class="p-4 rounded-lg transition-all duration-300">
+                        <!-- Content generated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Print Section -->
+            <section id="print" class="section-content">
+                 <h2 class="text-3xl font-bold mb-4">La Función `print()`</h2>
+                <p class="mb-6 text-slate-600">La función `print()` es tu herramienta para mostrar información en la pantalla. Puedes personalizar cómo se muestra la salida usando los argumentos `sep` (separador) y `end` (final).</p>
+
+                <div class="interactive-box">
+                    <h3 class="font-semibold mb-2 text-lg">Consola Simulada</h3>
+                    <p class="text-sm text-slate-500 mb-4">Prueba a escribir un comando `print`. Nuestro simulador simple entiende cadenas de texto y los argumentos `sep` y `end`. Ejemplos: `print("hola", "mundo")` o `print(1, 2, 3, sep="-")`.</p>
+                    <input type="text" id="print-input" class="w-full p-2 border border-slate-300 rounded-md code-font mb-4" value='print("hola", "mundo", sep="-")'>
+                    <button id="print-button" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Ejecutar Print</button>
+
+                    <div class="mt-6">
+                        <h4 class="font-semibold mb-2">Salida de la Consola:</h4>
+                        <div id="print-output" class="console-output"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Input Section -->
+            <section id="input" class="section-content">
+                <h2 class="text-3xl font-bold mb-4">La Función `input()`</h2>
+                <p class="mb-6 text-slate-600">`input()` hace que tus programas sean interactivos al permitirte pedir datos al usuario. La regla de oro es: **`input()` siempre devuelve los datos como una cadena de texto (`str`)**, sin importar lo que el usuario escriba.</p>
+
+                <div class="interactive-box">
+                    <h3 class="font-semibold mb-2 text-lg">Demostración de `input()`</h3>
+                    <p class="text-sm text-slate-500 mb-4">Sigue los pasos para ver esta regla en acción.</p>
+                    
+                    <div id="input-step1">
+                         <p class="mb-2">1. Haz clic para pedirle al usuario su edad:</p>
+                         <button id="input-ask-button" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Pedir Edad</button>
+                    </div>
+
+                    <div id="input-step2" class="hidden mt-4">
+                        <label for="input-user-age" class="block mb-2 code-font text-slate-600">Por favor, introduce tu edad:</label>
+                        <input type="text" id="input-user-age" class="p-2 border border-slate-300 rounded-md code-font" value="25">
+                        <button id="input-submit-button" class="bg-green-600 text-white font-bold py-2 px-4 rounded-md ml-2 hover:bg-green-700">Enviar</button>
+                    </div>
+
+                     <div id="input-result" class="hidden mt-4 p-4 bg-indigo-100 border border-indigo-200 rounded-lg text-indigo-800">
+                        <!-- Result here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Casting Section -->
+            <section id="casting" class="section-content">
+                <h2 class="text-3xl font-bold mb-4">Conversión de Tipos (Casting)</h2>
+                <p class="mb-6 text-slate-600">El "casting" es convertir un dato de un tipo a otro. Es esencial cuando trabajas con la función `input()`, ya que necesitas convertir el texto que recibes a un número (`int` o `float`) para poder hacer cálculos matemáticos.</p>
+
+                <div class="interactive-box">
+                    <h3 class="font-semibold mb-2 text-lg">Flujo de Cálculo de Edad</h3>
+                    <p class="text-sm text-slate-500 mb-4">Observa por qué la conversión de tipos es necesaria. Sigue los pasos para calcular la edad en 5 años.</p>
+
+                    <div class="space-y-4">
+                         <div>
+                            <p class="font-medium">Paso 1: Recibir la edad del usuario</p>
+                            <div class="p-3 bg-slate-100 rounded-md code-font mt-1">edad_texto = input("Tu edad: ") <span class="text-green-400">// El usuario escribe 30. `edad_texto` ahora es "30" (str).</span></div>
+                         </div>
+                         <div>
+                            <p class="font-medium">Paso 2: Intentar sumar sin convertir (¡Error!)</p>
+                            <div class="p-3 bg-red-100 rounded-md code-font mt-1">resultado = "30" + 5 <span class="text-red-500">// TypeError: no se puede sumar texto y número.</span></div>
+                         </div>
+                         <div>
+                            <p class="font-medium">Paso 3: La solución correcta (¡Convertir primero!)</p>
+                            <div id="casting-step-button-container">
+                                <button id="casting-button" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Ver la Conversión</button>
+                            </div>
+                            <div id="casting-step-result" class="hidden mt-2 space-y-2">
+                                <div class="p-3 bg-yellow-100 rounded-md code-font">edad_numero = int("30") <span class="text-yellow-700">// Convierte "30" (str) a 30 (int).</span></div>
+                                <div class="p-3 bg-green-100 rounded-md code-font">resultado = 30 + 5 <span class="text-green-700">// Ahora sí funciona. El resultado es 35.</span></div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('.section-content');
+
+            // Navigation handler
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const sectionId = button.dataset.section;
+
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('active-nav');
+                        btn.classList.add('inactive-nav');
+                    });
+                    button.classList.add('active-nav');
+                    button.classList.remove('inactive-nav');
+
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+
+            // Section 1: Variables
+            const varInput = document.getElementById('var-input');
+            const varButton = document.getElementById('var-button');
+            const varVizOutput = document.getElementById('var-viz-output');
+
+            varButton.addEventListener('click', () => {
+                const inputText = varInput.value.trim();
+                const parts = inputText.split('=').map(p => p.trim());
+
+                if (parts.length !== 2 || !parts[0] || !parts[1]) {
+                    varVizOutput.innerHTML = `<span class="text-red-500">Sintaxis inválida. Usa: nombre = valor</span>`;
+                    return;
+                }
+
+                const varName = parts[0];
+                const varValue = parts[1];
+
+                varVizOutput.innerHTML = `
+                    <div class="variable-tag code-font">${varName}</div>
+                    <div class="text-2xl font-bold text-slate-800 code-font">${varValue}</div>
+                `;
+            });
+            varButton.click(); // Initial run
+
+            // Section 2: Data Types
+            const typeInput = document.getElementById('type-input');
+            const typeOutput = document.getElementById('type-output');
+            
+            function analyzeType() {
+                const value = typeInput.value.trim();
+                let typeName = '';
+                let typeClass = '';
+                let explanation = '';
+
+                if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+                    typeName = 'bool';
+                    typeClass = 'bg-sky-100 text-sky-800';
+                    explanation = 'Representa valores de verdad: Verdadero o Falso.';
+                } else if (!isNaN(value) && value.includes('.')) {
+                    typeName = 'float';
+                    typeClass = 'bg-amber-100 text-amber-800';
+                    explanation = 'Representa números con parte decimal.';
+                } else if (!isNaN(value) && value !== '') {
+                    typeName = 'int';
+                    typeClass = 'bg-teal-100 text-teal-800';
+                    explanation = 'Representa números enteros, sin decimales.';
+                } else {
+                    typeName = 'str';
+                    typeClass = 'bg-rose-100 text-rose-800';
+                    explanation = 'Representa una secuencia de caracteres de texto.';
+                }
+                
+                typeOutput.className = `p-4 rounded-lg transition-all duration-300 ${typeClass}`;
+                typeOutput.innerHTML = `
+                    <p class="font-bold text-lg">Tipo Detectado: <span class="code-font font-extrabold">&lt;class '${typeName}'&gt;</span></p>
+                    <p class="mt-1">${explanation}</p>
+                `;
+            }
+            typeInput.addEventListener('input', analyzeType);
+            analyzeType(); // Initial run
+
+            // Section 3: Print
+            const printInput = document.getElementById('print-input');
+            const printButton = document.getElementById('print-button');
+            const printOutput = document.getElementById('print-output');
+
+            printButton.addEventListener('click', () => {
+                const command = printInput.value.trim();
+                if (!command.startsWith('print(') || !command.endsWith(')')) {
+                    printOutput.textContent = 'Error: Comando inválido. Debe empezar con print(...).';
+                    return;
+                }
+
+                const content = command.substring(6, command.length - 1);
+                
+                // Simple parser for args, sep, and end
+                let argsStr = content;
+                let sep = ' ';
+                let end = '\\n';
+
+                if (content.includes('sep=')) {
+                    const sepMatch = content.match(/sep=(["'])(.*?)\1/);
+                    if (sepMatch) {
+                        sep = sepMatch[2];
+                        argsStr = argsStr.replace(/,?\s*sep=(["']).*?\1/, '');
+                    }
+                }
+                 if (content.includes('end=')) {
+                    const endMatch = content.match(/end=(["'])(.*?)\1/);
+                    if (endMatch) {
+                        end = endMatch[2];
+                        argsStr = argsStr.replace(/,?\s*end=(["']).*?\1/, '');
+                    }
+                }
+                
+                const args = argsStr.split(',').map(arg => {
+                    const trimmedArg = arg.trim();
+                    if (trimmedArg.startsWith('"') && trimmedArg.endsWith('"')) {
+                        return trimmedArg.slice(1, -1);
+                    }
+                    if (trimmedArg.startsWith("'") && trimmedArg.endsWith("'")) {
+                        return trimmedArg.slice(1, -1);
+                    }
+                    return trimmedArg; // Keep numbers as is
+                }).filter(arg => arg !=='');
+
+                let output = args.join(sep);
+                if (end === '\\n') {
+                    output += '\n';
+                } else {
+                    output += end;
+                }
+                printOutput.textContent = output;
+            });
+            printButton.click();
+
+            // Section 4: Input
+            const askButton = document.getElementById('input-ask-button');
+            const step2Div = document.getElementById('input-step2');
+            const submitButton = document.getElementById('input-submit-button');
+            const resultDiv = document.getElementById('input-result');
+            const userAgeInput = document.getElementById('input-user-age');
+
+            askButton.addEventListener('click', () => {
+                step2Div.classList.remove('hidden');
+                resultDiv.classList.add('hidden');
+            });
+
+            submitButton.addEventListener('click', () => {
+                const age = userAgeInput.value;
+                resultDiv.classList.remove('hidden');
+                resultDiv.innerHTML = `
+                    <p class="font-semibold">¡Información recibida!</p>
+                    <p>Tu función ` + '`input()`' + ` ha devuelto el valor: <span class="code-font font-bold">${age}</span></p>
+                    <p>El tipo de dato de este valor es: <span class="code-font font-bold text-red-600">&lt;class 'str'&gt;</span></p>
+                `;
+            });
+
+            // Section 5: Casting
+            const castingButton = document.getElementById('casting-button');
+            const castingResult = document.getElementById('casting-step-result');
+
+            castingButton.addEventListener('click', () => {
+                castingResult.classList.toggle('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
