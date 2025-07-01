@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutral with Teal Accent (bg-stone-50, text-stone-800, accent-teal-600) -->
+    <!-- Application Structure Plan: A single-page application with a persistent left-sidebar for navigation and a main content area. This structure allows users to non-linearly jump between topics, which is superior to a simple scroll for a learning reference. JavaScript will manage showing/hiding content sections based on navigation clicks, creating a fluid SPA experience without page reloads. -->
+    <!-- Visualization & Content Choices:
+    - Goal: Make abstract concepts tangible.
+    - Listas: Interactive HTML elements to visualize indexing, appending, and popping. Live simulation of the "reference vs. copy" problem is key for understanding.
+    - Bucles: Animation of the iteration process (item moving from list to variable) to clarify the flow.
+    - Variables: HTML/CSS diagrams of Global vs. Local scope to provide a spatial understanding. Custom error explanations for UnboundLocalError to demystify it.
+    - Funciones: "Factory" animation showing arguments in, list out. Visual distinction between `print` (to console) and `return` (to program).
+    - Tuplas vs Listas: A Chart.js horizontal bar chart to visually summarize their trade-offs (Mutability vs. Performance/Security). This provides a quick, memorable comparison.
+    - Library/Method: Vanilla JS for all logic. Chart.js for the comparison chart. All visuals are built with HTML/CSS and Unicode to avoid SVG/image dependencies. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;600&display=swap');
+        .fira-code {
+            font-family: 'Fira Code', monospace;
+        }
+        .nav-link.active {
+            background-color: #e0f2f1;
+            color: #00796b;
+            font-weight: 600;
+        }
+        .interactive-box {
+            transition: all 0.3s ease-in-out;
+            min-height: 40px;
+        }
+        .highlight-box {
+            animation: highlight 1.5s ease-in-out;
+        }
+        @keyframes highlight {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 121, 107, 0); }
+            50% { transform: scale(1.05); box-shadow: 0 0 15px 5px rgba(0, 121, 107, 0.4); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 121, 107, 0); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .shake-anim {
+            animation: shake 0.5s linear;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white border-r border-stone-200 p-5 hidden md:block">
+            <h1 class="text-xl font-bold text-teal-800 mb-8">Python Básico</h1>
+            <nav id="nav-menu" class="space-y-2">
+                 <a href="#introduccion" data-section="introduccion" class="nav-link active flex items-center p-2 rounded-lg hover:bg-stone-100 transition-colors">👋 Introducción</a>
+                <a href="#listas" data-section="listas" class="nav-link flex items-center p-2 rounded-lg hover:bg-stone-100 transition-colors">📦 Listas</a>
+                <a href="#bucles" data-section="bucles" class="nav-link flex items-center p-2 rounded-lg hover:bg-stone-100 transition-colors">🔄 Bucles for</a>
+                <a href="#variables" data-section="variables" class="nav-link flex items-center p-2 rounded-lg hover:bg-stone-100 transition-colors">🏠 Variables</a>
+                <a href="#funciones" data-section="funciones" class="nav-link flex items-center p-2 rounded-lg hover:bg-stone-100 transition-colors">⚙️ Funciones</a>
+                <a href="#tuplas" data-section="tuplas" class="nav-link flex items-center p-2 rounded-lg hover:bg-stone-100 transition-colors">🔒 Tuplas</a>
+                <a href="#conclusion" data-section="conclusion" class="nav-link flex items-center p-2 rounded-lg hover:bg-stone-100 transition-colors">🚀 Conclusión</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 lg:p-10 overflow-y-auto">
+            
+            <!-- Introduccion Section -->
+            <section id="introduccion" class="content-section space-y-6">
+                <h2 class="text-4xl font-bold text-teal-900 border-b-4 border-teal-200 pb-2">¡Bienvenido/a al Mundo de la Programación!</h2>
+                <p class="text-lg text-stone-700">Aprender a programar es como aprender a escribir una receta de cocina muy detallada para un ordenador. Python es un lenguaje ideal para empezar porque es potente y fácil de leer. Esta guía interactiva te ayudará a dar tus primeros pasos.</p>
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Los 5 Bloques Fundamentales</h3>
+                    <p class="mb-6">Exploraremos cinco conceptos clave que son la base de casi todo lo que harás en Python. Haz clic en la barra de navegación para saltar a cualquier tema.</p>
+                    <ul class="space-y-4 text-stone-600">
+                        <li class="flex items-start"><span class="text-2xl mr-4">📦</span><div><span class="font-bold">Listas:</span> Cajas de herramientas para guardar y organizar tus datos de forma flexible.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-4">🔄</span><div><span class="font-bold">Bucles `for`:</span> La forma de automatizar tareas repetitivas y trabajar con cada elemento de tus colecciones.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-4">🏠</span><div><span class="font-bold">Variables Locales y Globales:</span> Aprende a organizar dónde viven tus datos para evitar conflictos.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-4">⚙️</span><div><span class="font-bold">Funciones que Devuelven Listas:</span> Crea "fábricas" de datos que producen resultados listos para usar.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-4">🔒</span><div><span class="font-bold">Tuplas:</span> Vitrinas selladas para proteger datos importantes que no deben cambiar jamás.</div></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Listas Section -->
+            <section id="listas" class="content-section hidden space-y-6">
+                <h2 class="text-4xl font-bold text-teal-900 border-b-4 border-teal-200 pb-2">📦 Listas: Tu Caja de Herramientas</h2>
+                <p class="text-lg text-stone-700">Una lista es un contenedor ordenado y <span class="font-semibold text-teal-700">mutable</span> (modificable). Piensa en ella como una lista de la compra digital que puedes cambiar en cualquier momento.</p>
+                
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Accediendo a Elementos por Índice</h3>
+                    <p class="mb-4">Python usa un <span class="font-semibold text-teal-700">índice de base cero</span>. ¡El primer elemento está en el índice 0! Usa los botones para ver cómo se resalta el elemento correspondiente.</p>
+                    <div id="lista-visual" class="flex flex-wrap gap-2 mb-4 p-4 bg-stone-100 rounded-lg justify-center">
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <button onclick="highlightIndex(0)" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Índice 0</button>
+                        <button onclick="highlightIndex(2)" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Índice 2</button>
+                        <button onclick="highlightIndex(-1)" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Índice -1 (Último)</button>
+                        <button onclick="highlightIndex(-3)" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Índice -3 (Antepenúltimo)</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Modificando una Lista Interactivamente</h3>
+                     <p class="mb-4">La mutabilidad es el superpoder de las listas. Usa los botones para modificar la lista de abajo y ver los cambios al instante.</p>
+                    <div class="flex items-center gap-4 bg-stone-100 p-4 rounded-lg mb-4">
+                        <span class="font-semibold">Mi Lista:</span>
+                        <div id="lista-modificable" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <input id="lista-input" type="text" placeholder="Escribe un valor" class="border border-stone-300 rounded px-3 py-2">
+                        <button onclick="listaAppend()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">.append()</button>
+                        <button onclick="listaPop()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">.pop()</button>
+                        <button onclick="listaReset()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Resetear</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">¡Cuidado! Referencias vs. Copias</h3>
+                    <p class="mb-4">Cuando haces `copia = original`, no creas una nueva lista, ¡solo pones una nueva etiqueta en la misma! Modifica la "copia" y mira cómo la original también cambia.</p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-2">lista_original</h4>
+                             <div id="ref-original" class="flex flex-wrap gap-2 p-3 bg-stone-100 rounded-lg interactive-box"></div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2">copia_aparente</h4>
+                             <div id="ref-copia" class="flex flex-wrap gap-2 p-3 bg-stone-100 rounded-lg interactive-box"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                         <button onclick="refAppend()" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Añadir 'Z' a copia_aparente</button>
+                         <button onclick="refReset()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Resetear</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bucles for Section -->
+            <section id="bucles" class="content-section hidden space-y-6">
+                <h2 class="text-4xl font-bold text-teal-900 border-b-4 border-teal-200 pb-2">🔄 Bucles for: Acción para cada Elemento</h2>
+                <p class="text-lg text-stone-700">Un bucle `for` ejecuta un bloque de código para cada elemento de una colección iterable, como una lista. Es la clave para la automatización.</p>
+
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Visualizando la Iteración</h3>
+                    <p class="mb-4">Presiona "Iniciar Animación" para ver cómo el bucle `for` toma cada fruta de la lista, la asigna a la variable temporal y ejecuta el código.</p>
+                    <div class="grid md:grid-cols-3 gap-4 items-center">
+                        <div class="text-center">
+                            <h4 class="font-bold mb-2">frutas = [...]</h4>
+                            <div id="bucle-lista" class="space-y-2 p-3 bg-stone-100 rounded-lg"></div>
+                        </div>
+                        <div class="text-center text-4xl text-teal-500">
+                            ➡️
+                        </div>
+                        <div class="text-center">
+                            <h4 class="font-bold mb-2">fruta</h4>
+                            <div id="bucle-variable" class="p-3 bg-teal-100 border-2 border-dashed border-teal-400 rounded-lg interactive-box flex items-center justify-center font-bold text-teal-800"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-center">
+                        <button id="bucle-start-btn" onclick="startBucleAnimation()" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Iniciar Animación</button>
+                    </div>
+                    <pre class="fira-code bg-gray-900 text-white p-4 rounded-lg mt-4 text-sm overflow-x-auto"><code>for fruta in frutas:
+    print(f"- Una {fruta}")</code></pre>
+                </div>
+            </section>
+            
+            <!-- Variables Section -->
+            <section id="variables" class="content-section hidden space-y-6">
+                <h2 class="text-4xl font-bold text-teal-900 border-b-4 border-teal-200 pb-2">🏠 Variables: ¿Dónde Viven tus Datos?</h2>
+                <p class="text-lg text-stone-700">El <span class="font-semibold text-teal-700">ámbito (scope)</span> de una variable define dónde es accesible. Es como tener espacios comunes y habitaciones privadas en una casa.</p>
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Visualización de Ámbito (Scope)</h3>
+                    <p class="mb-4">Haz clic para ejecutar la función. Observa cómo la variable local solo existe dentro de su función, mientras que la global es accesible desde todas partes.</p>
+                    <div id="scope-global" class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 relative">
+                        <h4 class="font-bold text-blue-800">Ámbito Global 🌍</h4>
+                        <div id="scope-global-vars" class="mt-2 space-y-1"></div>
+                        <div id="scope-local" class="bg-green-50 border-2 border-green-300 rounded-lg p-4 m-4">
+                            <h4 class="font-bold text-green-800">Ámbito Local (función) 🏠</h4>
+                             <div id="scope-local-vars" class="mt-2 space-y-1"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <button onclick="runScopeExample()" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Ejecutar Función</button>
+                        <button onclick="resetScopeExample()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Resetear</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">El Misterioso `UnboundLocalError`</h3>
+                    <p class="mb-4">¿Por qué este código falla? Python asume que si asignas un valor a una variable en una función, es local. ¡Intenta usarla antes de darle un valor! Ejecuta el código para ver una explicación detallada.</p>
+                    <pre class="fira-code bg-gray-900 text-white p-4 rounded-lg text-sm overflow-x-auto"><code>contador = 0
+
+def incrementar():
+    contador += 1 # Python asume 'contador' es local aquí
+    print(contador)</code></pre>
+                    <button onclick="showUnboundError()" class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Intentar Ejecutar</button>
+                    <div id="unbound-error-explanation" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+                        <p><span class="font-bold">¡Error! `UnboundLocalError`.</span> Esto pasa porque:</p>
+                        <ol class="list-decimal list-inside mt-2">
+                            <li>Python ve `contador += 1` y decide que `contador` es una variable **local**.</li>
+                            <li>Luego, para calcular `contador + 1`, intenta leer el valor de la variable *local* `contador`.</li>
+                            <li>¡Pero nunca le diste un valor inicial a la `contador` local! Por eso falla.</li>
+                            <li>La solución es usar `global contador` para indicarle que quieres modificar la variable global.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Funciones Section -->
+            <section id="funciones" class="content-section hidden space-y-6">
+                <h2 class="text-4xl font-bold text-teal-900 border-b-4 border-teal-200 pb-2">⚙️ Funciones: Fábricas de Código</h2>
+                <p class="text-lg text-stone-700">Las funciones son bloques de código reutilizables. La diferencia entre `print()` y `return` es crucial: `print()` es para humanos, `return` es para el programa.</p>
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">La Fábrica de Listas</h3>
+                    <p class="mb-4">Esta función `generar_numeros_pares` actúa como una fábrica. Dale un límite y te <span class="font-bold text-teal-700">devolverá</span> una lista de números pares.</p>
+                    <div class="flex items-center justify-around p-4 bg-stone-100 rounded-lg">
+                        <div class="text-center">
+                            <label for="limite-input" class="font-bold">Límite:</label>
+                            <input id="limite-input" type="number" value="20" class="w-20 border border-stone-300 rounded p-2 text-center">
+                        </div>
+                        <div class="text-4xl text-teal-500">
+                           ➡️
+                        </div>
+                        <div class="bg-teal-500 text-white p-4 rounded-lg text-center">
+                            <span class="text-2xl">⚙️</span>
+                            <p class="font-bold">Función</p>
+                        </div>
+                         <div class="text-4xl text-teal-500">
+                           ➡️
+                        </div>
+                        <div id="funcion-output-caja" class="p-3 bg-teal-100 border-2 border-dashed border-teal-400 rounded-lg min-w-[200px] text-center">
+                           <span class="text-stone-500">Resultado...</span>
+                        </div>
+                    </div>
+                     <div class="mt-4 flex justify-center">
+                        <button onclick="runFactoryFunction()" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Generar Lista</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Tuplas Section -->
+            <section id="tuplas" class="content-section hidden space-y-6">
+                <h2 class="text-4xl font-bold text-teal-900 border-b-4 border-teal-200 pb-2">🔒 Tuplas: Datos Inmutables</h2>
+                <p class="text-lg text-stone-700">Una tupla es una colección ordenada e <span class="font-semibold text-red-700">inmutable</span> (no se puede cambiar). Son como un recibo impreso: su contenido es fijo y seguro.</p>
+                
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Prueba de Inmutabilidad</h3>
+                    <p class="mb-4">Intenta modificar la tupla. Verás que Python no te deja, ¡y eso es una garantía de seguridad!</p>
+                    <div id="tupla-visual" class="flex flex-wrap gap-2 mb-4 p-4 bg-red-50 border-2 border-dashed border-red-300 rounded-lg justify-center interactive-box">
+                        <div class="bg-red-200 p-2 rounded">"rojo"</div>
+                        <div class="bg-red-200 p-2 rounded">"amarillo"</div>
+                        <div class="bg-red-200 p-2 rounded">"azul"</div>
+                    </div>
+                    <div class="flex justify-center">
+                         <button onclick="tryToModifyTuple()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Intentar cambiar "amarillo" por "naranja"</button>
+                    </div>
+                    <p id="tupla-error" class="text-center font-bold text-red-700 mt-4 h-6"></p>
+                </div>
+                
+                 <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Listas vs. Tuplas: La Comparación</h3>
+                    <p class="mb-4">¿Cuándo usar una u otra? Este gráfico resume las diferencias clave. Las listas son flexibles, pero las tuplas son más rápidas y seguras para datos constantes.</p>
+                    <div class="chart-container">
+                        <canvas id="list-tuple-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Conclusion Section -->
+            <section id="conclusion" class="content-section hidden space-y-6">
+                 <h2 class="text-4xl font-bold text-teal-900 border-b-4 border-teal-200 pb-2">🚀 ¡Has Construido tu Base! ¿Y Ahora Qué?</h2>
+                <p class="text-lg text-stone-700">¡Felicidades! Has completado un viaje intensivo a través de cinco de los conceptos más importantes de Python. Has pasado de no saber cómo guardar datos a entender cómo construir tus propias "fábricas" de información.</p>
+                <div class="p-6 bg-white rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">Tus Nuevas Herramientas</h3>
+                    <ul class="space-y-3 list-disc list-inside text-stone-600">
+                        <li><span class="font-bold">Listas:</span> Cajas de herramientas flexibles y modificables.</li>
+                        <li><span class="font-bold">Bucles `for`:</span> Automatización de tareas sobre colecciones.</li>
+                        <li><span class="font-bold">Ámbito de variables:</span> Organización del código con espacios privados y comunes.</li>
+                        <li><span class="font-bold">Funciones con `return`:</span> Fábricas que devuelven resultados listos para usar.</li>
+                        <li><span class="font-bold">Tuplas:</span> Colecciones seguras e inmutables.</li>
+                    </ul>
+                </div>
+                 <div class="p-6 bg-teal-50 border border-teal-200 rounded-xl">
+                    <h3 class="text-2xl font-semibold text-teal-800 mb-4">¡Ponte a prueba!</h3>
+                    <p class="mb-4">La verdadera comprensión llega al escribir código. ¡No te detengas aquí! Intenta combinar estos bloques para construir algo tuyo. Aquí tienes algunas ideas:</p>
+                    <ul class="space-y-3 list-disc list-inside text-teal-700">
+                        <li>Crea un programa que gestione tu lista de películas por ver. Usa una lista para guardarlas y un bucle para mostrarlas.</li>
+                        <li>Escribe una función que reciba una lista de gastos (números) y devuelva la suma total.</li>
+                        <li>Diseña un pequeño juego de adivinanzas donde el ordenador tiene una lista de números secretos.</li>
+                    </ul>
+                     <p class="mt-4 font-semibold">Has construido una base sólida. ¡El viaje no ha hecho más que empezar!</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    // --- Navigation Logic ---
+    function showSection(sectionId) {
+        contentSections.forEach(section => {
+            section.classList.add('hidden');
+        });
+        document.getElementById(sectionId).classList.remove('hidden');
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.dataset.section === sectionId) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const sectionId = link.dataset.section;
+            window.location.hash = sectionId;
+            showSection(sectionId);
+            // Initialize interactions for the shown section
+            if(sectionId === 'listas') initListas();
+            if(sectionId === 'bucles') initBucles();
+            if(sectionId === 'variables') initVariables();
+            if(sectionId === 'tuplas') initTuplas();
+        });
+    });
+
+    const initialSection = window.location.hash.substring(1) || 'introduccion';
+    showSection(initialSection);
+    
+    // Initialize section-specific scripts
+    initListas();
+    initBucles();
+    initVariables();
+    initTuplas();
+});
+
+// --- LISTAS SECTION SCRIPT ---
+let listaVisualData = ['manzana', 'banana', 'cereza', 'naranja', 'uva'];
+let listaModificableData = ['A', 'B', 'C'];
+let refOriginalData = ['X', 'Y'];
+let refCopiaData = refOriginalData; // This is a reference, not a copy!
+
+function renderList(elementId, data) {
+    const container = document.getElementById(elementId);
+    container.innerHTML = '';
+    data.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'bg-stone-200 p-2 rounded interactive-box';
+        div.textContent = `"${item}"`;
+        div.dataset.index = index;
+        container.appendChild(div);
+    });
+}
+
+function highlightIndex(index) {
+    const container = document.getElementById('lista-visual');
+    const allItems = container.querySelectorAll('div');
+    allItems.forEach(item => item.classList.remove('highlight-box', 'bg-teal-300'));
+    
+    let targetIndex = index;
+    if (index < 0) {
+        targetIndex = listaVisualData.length + index;
+    }
+    
+    const targetElement = container.querySelector(`div[data-index='${targetIndex}']`);
+    if (targetElement) {
+        targetElement.classList.add('highlight-box', 'bg-teal-300');
+    }
+}
+
+function listaAppend() {
+    const input = document.getElementById('lista-input');
+    const value = input.value.trim();
+    if (value) {
+        listaModificableData.push(value);
+        renderList('lista-modificable', listaModificableData);
+        input.value = '';
+    }
+}
+
+function listaPop() {
+    if (listaModificableData.length > 0) {
+        listaModificableData.pop();
+        renderList('lista-modificable', listaModificableData);
+    }
+}
+
+function listaReset() {
+    listaModificableData = ['A', 'B', 'C'];
+    renderList('lista-modificable', listaModificableData);
+}
+
+function refAppend() {
+    refCopiaData.push('Z');
+    // Because refCopiaData is a reference, modifying it also modifies refOriginalData
+    renderList('ref-original', refOriginalData);
+    renderList('ref-copia', refCopiaData);
+    document.getElementById('ref-original').classList.add('highlight-box');
+}
+
+function refReset() {
+    refOriginalData = ['X', 'Y'];
+    refCopiaData = refOriginalData;
+    renderList('ref-original', refOriginalData);
+    renderList('ref-copia', refCopiaData);
+    document.getElementById('ref-original').classList.remove('highlight-box');
+}
+
+function initListas() {
+    renderList('lista-visual', listaVisualData);
+    listaReset();
+    refReset();
+}
+
+
+// --- BUCLES SECTION SCRIPT ---
+const bucleFrutas = ['Manzana 🍎', 'Banana 🍌', 'Cereza 🍒'];
+
+function initBucles() {
+    const listaContainer = document.getElementById('bucle-lista');
+    listaContainer.innerHTML = '';
+    bucleFrutas.forEach(fruta => {
+        const div = document.createElement('div');
+        div.className = 'p-2 bg-stone-200 rounded';
+        div.textContent = fruta;
+        listaContainer.appendChild(div);
+    });
+    document.getElementById('bucle-variable').textContent = '';
+}
+
+async function startBucleAnimation() {
+    const btn = document.getElementById('bucle-start-btn');
+    btn.disabled = true;
+    btn.textContent = 'Animando...';
+
+    const listaItems = document.querySelectorAll('#bucle-lista div');
+    const variableBox = document.getElementById('bucle-variable');
+
+    for (let i = 0; i < listaItems.length; i++) {
+        listaItems[i].classList.add('bg-yellow-300');
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        variableBox.textContent = bucleFrutas[i];
+        variableBox.classList.add('highlight-box');
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        listaItems[i].classList.remove('bg-yellow-300');
+        listaItems[i].classList.add('bg-green-300');
+        variableBox.classList.remove('highlight-box');
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    initBucles();
+    btn.disabled = false;
+    btn.textContent = 'Iniciar Animación';
+}
+
+// --- VARIABLES SECTION SCRIPT ---
+function initVariables() {
+    resetScopeExample();
+    document.getElementById('unbound-error-explanation').classList.add('hidden');
+}
+
+function runScopeExample() {
+    resetScopeExample();
+    const globalVars = document.getElementById('scope-global-vars');
+    const localVars = document.getElementById('scope-local-vars');
+
+    globalVars.innerHTML = '<p class="fira-code">mensaje_global = "Soy global"</p>';
+    
+    setTimeout(() => {
+        document.getElementById('scope-local').classList.add('highlight-box');
+        localVars.innerHTML = '<p class="fira-code">mensaje_local = "Soy local"</p><p class="fira-code text-blue-600">(leyendo mensaje_global)</p>';
+    }, 500);
+}
+
+function resetScopeExample() {
+    document.getElementById('scope-global-vars').innerHTML = '';
+    document.getElementById('scope-local-vars').innerHTML = '';
+    document.getElementById('scope-local').classList.remove('highlight-box');
+}
+
+function showUnboundError() {
+    document.getElementById('unbound-error-explanation').classList.remove('hidden');
+}
+
+// --- FUNCIONES SECTION SCRIPT ---
+function runFactoryFunction() {
+    const limite = parseInt(document.getElementById('limite-input').value) || 0;
+    const pares = [];
+    for (let i = 0; i < limite; i++) {
+        if (i % 2 === 0) {
+            pares.push(i);
+        }
+    }
+    const outputBox = document.getElementById('funcion-output-caja');
+    outputBox.textContent = `[${pares.join(', ')}]`;
+    outputBox.classList.add('highlight-box');
+    setTimeout(() => outputBox.classList.remove('highlight-box'), 1500);
+}
+
+
+// --- TUPLAS SECTION SCRIPT ---
+let chartInstance = null;
+
+function tryToModifyTuple() {
+    const tuplaBox = document.getElementById('tupla-visual');
+    const errorMsg = document.getElementById('tupla-error');
+    
+    tuplaBox.classList.add('shake-anim');
+    errorMsg.textContent = "TypeError: 'tuple' object does not support item assignment";
+    
+    setTimeout(() => {
+        tuplaBox.classList.remove('shake-anim');
+    }, 500);
+}
+
+function initTuplas() {
+    document.getElementById('tupla-error').textContent = '';
+    const ctx = document.getElementById('list-tuple-chart').getContext('2d');
+    
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Mutabilidad (Flexibilidad)', 'Rendimiento (Velocidad)', 'Seguridad (Inmutabilidad)'],
+            datasets: [{
+                label: 'Lista',
+                data: [10, 7, 5],
+                backgroundColor: 'rgba(52, 211, 153, 0.6)',
+                borderColor: 'rgba(5, 150, 105, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Tupla',
+                data: [1, 9, 10],
+                backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                borderColor: 'rgba(185, 28, 28, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 10,
+                    ticks: {
+                       stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Puntuación Relativa: Listas vs. Tuplas',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.raw;
+                            if(context.raw > 8) label += ' (Muy Alto)';
+                            else if(context.raw > 6) label += ' (Alto)';
+                            else if(context.raw > 3) label += ' (Medio)';
+                            else label += ' (Bajo)';
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+
+</body>
+</html>
